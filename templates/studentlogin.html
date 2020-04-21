@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block body %}
+  <h1>Student Login</h1> <br>
+  <form method="post">
+    <input type='text' placeholder="SID" class="getinput" name="sid">
+    <input type='password' placeholder="PASSWORD" class="getinput" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" name="password">
+    <button class='btn-get-started'>LOGIN</button>
+  </form> <br>
+  <div >
+    <a  href='forgot' >
+      Forgot Password
+    </a> <br>
+    <a  href='register' >
+      Create New Account
+    </a>
+  </div>
+{% endblock %}
