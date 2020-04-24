@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <h1 style="font-size: 35px">Forgot Password?</h1>
+    <div>
+        <form method="POST">
+            {{form.hidden_tag()}}
+            <div>
+                {{ form.email (class='getinput', placeholder='Email Id') }}
+                {% for error in form.email.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            {{ form.submit (class="btn-get-started") }}
+        </form>
+{% endblock %}

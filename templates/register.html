@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <h1>Register Here</h1>
+    <div>
+        <form method="POST">
+            {{form.hidden_tag()}}
+            <div style="margin-top: 20px"></div>
+            <div>
+                {{ form.name (class='getinput', placeholder='Name') }}
+                {% for error in form.name.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.sid (class='getinput', placeholder='SID') }}
+                {% for error in form.sid.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.email (class='getinput', placeholder='Email Id') }}
+                {% for error in form.email.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.phone (class='getinput', placeholder='Phone') }}
+                {% for error in form.phone.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.password (class='getinput', placeholder='Password') }}
+                {% for error in form.password.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.confirm_password (class='getinput', placeholder='Confirm Password') }}
+                {% for error in form.confirm_password.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            {{ form.submit (class="btn-get-started") }}
+        </form>
+    </div>
+{% endblock %}
+

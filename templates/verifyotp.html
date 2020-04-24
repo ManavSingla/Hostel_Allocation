@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <h1 style="font-size: 35px">Verify OTP</h1>
+    <div>
+        <form method="POST">
+            {{form.hidden_tag()}}
+            <div>
+                {{ form.otp (class='getinput', placeholder='Enter OTP') }}
+                {% for error in form.otp.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            {{ form.submit (class="btn-get-started") }}
+        </form>
+{% endblock %}

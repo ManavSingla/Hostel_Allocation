@@ -163,6 +163,8 @@ h1, h2, h4, h5, h6 {
   position: relative;
 }
 
+
+
 @media (min-width: 1024px) {
   #hero {
     background-attachment: fixed;
@@ -314,7 +316,8 @@ font-family: "Poppins", sans-serif;
   padding: 10px 28px;
   border-radius: 50px;
   transition: 0.5s;
-  margin: 20px;
+  margin:auto;
+  margin-top: 20px;
   background-color:transparent;
   border: 1.5px solid #fff;
   color:white;
@@ -336,6 +339,8 @@ font-family: "Poppins", sans-serif;
     
     transition: 0.5s;
 }
+
+
 #hero a
 {
   color:#2dca98;
@@ -1124,6 +1129,7 @@ body.mobile-nav-active #mobile-nav-toggle {
   border-radius: 0;
   box-shadow: none;
   font-size: 14px;
+  resize:none;
 }
 
 #contact .form button[type="submit"] {

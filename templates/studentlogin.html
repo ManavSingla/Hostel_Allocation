@@ -1,18 +1,33 @@
 {% extends 'base.html' %}
 
 {% block body %}
-  <h1>Student Login</h1> <br>
-  <form method="post">
-    <input type='text' placeholder="SID" class="getinput" name="sid">
-    <input type='password' placeholder="PASSWORD" class="getinput" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" name="password">
-    <button class='btn-get-started'>LOGIN</button>
-  </form> <br>
-  <div >
-    <a  href='forgot' >
-      Forgot Password
-    </a> <br>
-    <a  href='register' >
-      Create New Account
-    </a>
-  </div>
+    <h1>Student Login</h1> <br>
+    <div>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div>
+                {{ form.email (class='getinput', placeholder='Email Id') }}
+                {% for error in form.email.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.password (class='getinput', placeholder='Password') }}
+                {% for error in form.password.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            {{ form.submit (class="btn-get-started") }}
+        </form>
+    </div>
+        <div >
+            <a  href='forgot' >
+              Forgot Password
+            </a> <!-- <br>
+            <a  href='register' >
+              Create New Account
+            </a> -->
+        </div>
 {% endblock %}
