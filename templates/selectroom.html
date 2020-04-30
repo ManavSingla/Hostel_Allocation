@@ -1,0 +1,102 @@
+{% extends 'layout.html' %}
+
+{% block nav %}
+	<nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+            <a class="navbar-brand mr-4" href="{{url_for('shome')}}">PEC</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggle">
+                <div class="navbar-nav mr-auto">
+                    <a class="nav-item nav-link" href="{{url_for('shome')}}">Home</a>
+                </div>
+                <!-- Navbar Right Side -->
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link" href="{{url_for('updateprofile')}}">{{name}}</a>
+                    <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout</a> 
+                </div>
+              
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+
+    <div class="content-section">
+        <h3>Select Room</h3>
+        <br>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            {{form.hostel.label}}
+            {{form.hostel(class="custom-select", onchange="this.form.submit()")}}
+            <div style="margin-top: 10px"></div>
+            {{form.floor.label}}
+            {{form.floor(class="custom-select", onchange="this.form.submit()")}}
+            <div style="margin-top: 10px"></div>
+            {{form.capacity.label}}
+            {{form.capacity(class="custom-select", onchange="this.form.submit()")}}
+
+        </form>
+        {% if rooms %}
+        <table class="table responsive" style="margin-top: 20px">
+    {%for i in range(l)%}
+     <tr>
+         {%for j in range(10)%}
+         {%if rooms[i*10+j] in vacant %}
+
+         <td>
+
+             <a href="{{url_for('selected',roomnum=rooms[i*10+j],hostelname=form.hostel.data)}}" onclick="return confirmation();" >{{rooms[i*10+j]}} </a>
+         </td>
+         {%else%}
+         <td class="booked" style="background-color:lightgray;">
+            {{rooms[i*10+j]}}
+
+         </td>
+         {%endif%}
+         {%endfor%}
+     </tr>
+     {%endfor%}
+     {% for i in range(r) %}
+        {%if rooms[l*10+i] in vacant %}
+
+         <td>
+
+             <a href="{{url_for('selected',roomnum=rooms[l*10+i],hostelname=form.hostel.data)}}" onclick="return confirmation();" >{{rooms[l*10+i]}} </a>
+         </td>
+         {%else%}
+         <td class="booked" style="background-color:lightgray;">
+            {{rooms[l*10+i]}}
+
+         </td>
+         {%endif%}
+     {% endfor %}
+ </table>
+ {% endif %}
+    </div>
+{% endblock %}
+
+{% block rightcontent %}
+    {% if rooms %}
+    <div class="content-section">
+        <legend style="text-align: center;">Representation</legend>
+     <table class="table responsive" style="margin-top: 20px;">
+         <tr>
+             <td style="width: 70px">Vacant</td>
+             <td class="booked" style="width: 70px; background-color:lightgray;">Filled</td>
+         </tr>
+     </table>
+     
+    
+    <script type="text/javascript">
+        function confirmation()
+        {
+            var a=confirm("Are you sure you want to book ?")
+            return a;
+        }
+    </script>
+    </div>
+    {%endif%}
+{% endblock %}

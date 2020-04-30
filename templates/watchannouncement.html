@@ -1,0 +1,47 @@
+{% extends 'layout.html' %}
+
+{% block nav %}
+	<nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+            <a class="navbar-brand mr-4" href="{{url_for('shome')}}">PEC</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggle">
+                <div class="navbar-nav mr-auto">
+                    <a class="nav-item nav-link" href="{{url_for('shome')}}">Home</a>
+                </div>
+                <!-- Navbar Right Side -->
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link" href="{{url_for('updateprofile')}}">{{name}}</a>
+                    <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout</a> 
+                </div>
+              
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+{% if post %}
+<legend>All Announcements</legend>
+    {% for x in post %}
+        <article class="media content-section">
+            <img class="rounded-circle article-img" src="static/img/profile_pics/{{x[8]}}">
+          <div class="media-body">
+            <div class="article-metadata">
+                <p>
+                    <div class="mr-2">
+                        <strong>{{ x[2] }}</strong>
+                        <small class="text-muted" style="margin-left: 20px">{{ x[6] }}</small>
+                        <small class="text-muted" style="margin-left: 20px">{{ x[4].strftime('%Y-%m-%d') }}</small>
+                    </div>
+                </p>  
+            </div>
+            <h5><p class="article-title">{{ x[5] }}</p></h5>
+            <p class="article-content" style="white-space: pre-line; word-break: break-all;">{{ x[3] }}</p>
+        </div>
+        </article>
+    {% endfor %}
+{% endif %}
+{% endblock %}

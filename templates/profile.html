@@ -1,0 +1,87 @@
+{% extends 'layout.html' %}
+
+{% block nav %}
+    <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+            <a class="navbar-brand mr-4" href="{{url_for('facultyhome')}}">PEC</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggle">
+                <div class="navbar-nav mr-auto">
+                    <a class="nav-item nav-link" href="{{url_for('facultyhome')}}">Home</a>
+                </div>
+                <!-- Navbar Right Side -->
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link" href="{{url_for('facultyprofile')}}">{{name}}</a>
+                    <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+{% endblock %} 
+
+{% block content %}
+    <div class="content-section">
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Student Profile</legend>
+
+                <div class="form-group">
+                    {{ form.name.label(class="form-control-label") }}
+                    {{ form.name(class="form-control form-control-lg", readonly=True) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.sid.label(class="form-control-label") }}
+                    {{ form.sid(class="form-control form-control-lg", readonly=True) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    {{ form.email(class="form-control form-control-lg", readonly=True) }}
+                </div>                
+
+                <div class="form-group">
+                    {{ form.phone.label(class="form-control-label") }}
+                    {{ form.phone(class="form-control form-control-lg", readonly=True) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.batch.label }}
+                    {{ form.batch(class="custom-select", disabled=True) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.hostel.label(class="form-control-label") }}
+                    {{ form.hostel(class="custom-select", disabled=True) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.roomnum.label(class="form-control-label") }}
+                    {{ form.roomnum(class="form-control form-control-lg", readonly=True) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.guardianname.label(class="form-control-label") }}
+                    {{ form.guardianname(class="form-control form-control-lg", readonly=True) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.guardianphone.label(class="form-control-label") }}
+                    {{ form.guardianphone(class="form-control form-control-lg", readonly=True) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form.address.label(class="form-control-label") }}
+                    {{ form.address(class="form-control form-control-lg", readonly=True) }}
+                </div>
+
+            </fieldset>
+            <div class="form-group">
+                {{ form.blacklist(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+{% endblock %}

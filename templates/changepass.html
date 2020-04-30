@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block body %}
+    <h1 style="font-size: 35px">Create New Password</h1>
+    <div>
+        <form method="POST">
+            {{form.hidden_tag()}}
+            <div>
+                {{ form.oldpassword (class='getinput', placeholder='Enter Old Password') }}
+                {% for error in form.oldpassword.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.newpassword (class='getinput', placeholder='Enter New Password') }}
+                {% for error in form.newpassword.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.confirmnewpassword (class='getinput', placeholder='Confirm New Password') }}
+                {% for error in form.confirmnewpassword.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+
+            {{ form.submit (class="btn-get-started") }}
+        </form>
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends 'layout.html' %}
+
+{% block nav %}
+    <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+            <a class="navbar-brand mr-4" href="{{url_for('facultyhome')}}">PEC</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggle">
+                <div class="navbar-nav mr-auto">
+                    <a class="nav-item nav-link" href="{{url_for('facultyhome')}}">Home</a>
+                    <a class="nav-item nav-link" href="{{url_for('allotmentcriteria')}}">Allotment Criteria</a>
+                    <a class="nav-item nav-link" href="{{url_for('deallocaterooms')}}">Deallocate</a> 
+                </div>
+                <!-- Navbar Right Side -->
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link" href="{{url_for('facultyprofile')}}">{{name}}</a>
+                    <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout</a> 
+                </div>
+              
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {% if rooms %}
+    <div class="content-section">
+        <LEGEND>Room's Status</LEGEND>
+        <table class="table responsive" style="margin-top: 20px">
+    {%for i in range(l)%}
+     <tr>
+         {%for j in range(10)%}
+
+         {% if rooms[i*10+j] in first %}
+            <td style="background-color: #d2b48c">
+                {{rooms[i*10+j]}} 
+            </td>
+         {% elif rooms[i*10+j] in second %}
+            <td style="background-color: lightgrey">
+                {{rooms[i*10+j]}}
+            </td>
+         {% elif rooms[i*10+j] in third %}
+            <td style="background-color: lightgreen">
+                {{rooms[i*10+j]}}
+            </td>
+         {% elif rooms[i*10+j] in fourth %}
+            <td style="background-color: #fed8b1">
+                {{rooms[i*10+j]}}
+            </td>
+         {% else %}
+            <td>
+                {{rooms[i*10+j]}}
+            </td>
+         {% endif %}
+
+         {%endfor%}
+     </tr>
+     {%endfor%}
+     {% for i in range(r) %}
+
+         {% if rooms[l*10+i] in first %}
+            <td style="background-color: #d2b48c"> 
+                {{rooms[l*10+i]}} 
+            </td>
+         {% elif rooms[l*10+i] in second %}
+            <td style="background-color: lightgrey">
+                {{rooms[l*10+i]}}
+            </td>
+         {% elif rooms[l*10+i] in third %}
+            <td style="background-color: lightgreen">
+                {{rooms[l*10+i]}}
+            </td>
+         {% elif rooms[l*10+i] in fourth %}
+            <td style="background-color: #fed8b1">
+                {{rooms[l*10+i]}}
+            </td>
+         {% else %}
+            <td>
+                {{rooms[l*10+i]}}
+            </td>
+         {% endif %}
+     {% endfor %}
+    </table>
+    <div class="row" style="margin-top: 50px;margin-left: 20px">
+     <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.reset(class="btn btn-outline-info", style="width:90px") }}
+        </div>
+    </form>  
+    </div>
+</div>
+
+    {%endif%}
+
+{% endblock %}
+
+{% block rightcontent %}
+    <div class="content-section">
+        <LEGEND>Representation</LEGEND>
+     <table style="margin-top: 20px;margin-bottom: 50px">
+         
+         <tr>
+             <td style="background-color: #d2b48c;">First Year</td>
+             <td style="background-color: lightgrey">Second Year</td>
+             <td style="background-color: lightgreen">Third Year</td>
+             <td style="background-color: #fed8b1">Fourth Year</td>
+         </tr>
+     </table>
+    </div>
+{% endblock %}

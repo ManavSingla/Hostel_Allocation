@@ -1,19 +1,20 @@
-{% extends 'base1.html' %}
+{% extends 'layout.html' %}
 
 {% block nav %}
     <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
         <div class="container">
-            <a class="navbar-brand mr-4" href="/facultyloggedin">PEC</a>
+            <a class="navbar-brand mr-4" href="{{url_for('facultyhome')}}">PEC</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarToggle">
                 <div class="navbar-nav mr-auto">
-                    <a class="nav-item nav-link" href="/facultyloggedin">Home</a>
+                    <a class="nav-item nav-link" href="{{url_for('facultyhome')}}">Home</a>
                 </div>
                 <!-- Navbar Right Side -->
                 <div class="navbar-nav">
-
+                    <a class="nav-item nav-link" href="{{url_for('facultyprofile')}}">{{name}}</a>
+                    <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout</a>
                 </div>
             </div>
         </div>
@@ -21,26 +22,28 @@
 {% endblock %}            
 
 {% block content %}
-    <main role="main" class="container">
-        <div class="row">
-            <div class="col-md-8">
-                <h3>Upload Student List</h3>
-                <br>
-                <form method='POST' enctype="multipart/form-data">
-                    <p>
-                        HOSTEL:
-                        <select  name="stream" class="custom-select" required="">
-                            <option value="HIMALAYA">HIMALAYA</option>
-                            <option value="SHIVALIK">SHIVALIK</option>
-                        </select>
-                    </p>     
+    <div class="content-section">
+        <h3>Upload Student List</h3>
+        <br>
+        <form method='POST' enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
 
-                    <input type="file" name="file" accept=".xls,.xlsx,.csv,.ppt,.pptx,.txt,.docx"  required >
-                    <br><br>
+            {{form.hostel.label}}
+            {{form.hostel(class="custom-select mb-4", disabled=True)}}
 
-                    <input type="submit" name="Uploadfile" value="Upload  file">
-                </form>
+            <div class="form-group mb-4">
+                {{ form.file.label() }}
+                {{ form.file(class='form-control-file')}}
+                {% if form.file.errors %}
+                    {% for error in form.file.errors %}
+                        <span class="text-danger">{{error}}</span> <br>
+                    {% endfor %}
+                {% endif %}
             </div>
-        </div>
-    </main>
+
+            <div class="form-group" style="margin-top: 10px">
+                {{ form.post(class="btn btn-outline-info") }}
+            </div> 
+        </form>
+    </div>
 {% endblock %}

@@ -1,10 +1,30 @@
 {% extends 'base.html' %}
 
 {% block body %}
-    <h1>faculty login</h1> <br>
-    <form method="post">
-        <input type='text' placeholder="LOGIN ID" class="getinput" name="logid" required>
-        <input type='password' placeholder="PASSWORD" class="getinput" name="password" required>
-        <input type='submit' value="LOGIN" class='btn-get-started'>
-    </form> <br> <br>
+    <h1>Faculty Login</h1> <br>
+    <div>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div>
+                {{ form.email (class='getinput', placeholder='Email Id') }}
+                {% for error in form.email.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            <div>
+                {{ form.password (class='getinput', placeholder='Password') }}
+                {% for error in form.password.errors %}
+                    <span style="color:red; font-size: 14px;">{{ error }}</span>
+                {% endfor %}
+            </div>
+
+            {{ form.submit (class="btn-get-started") }}
+        </form>
+    </div>
+        <div >
+            <a  href="{{url_for('facultyforgot')}}" >
+              Forgot Password
+            </a>
+        </div>
 {% endblock %}

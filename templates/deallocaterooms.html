@@ -1,0 +1,95 @@
+{% extends 'layout.html' %}
+
+{% block nav %}
+    <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+            <a class="navbar-brand mr-4" href="{{url_for('facultyhome')}}">PEC</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarToggle">
+                <div class="navbar-nav mr-auto">
+                    <a class="nav-item nav-link" href="{{url_for('facultyhome')}}">Home</a>
+                    <a class="nav-item nav-link" href="{{url_for('allotmentcriteria')}}">Allotment Criteria</a>
+                    <a class="nav-item nav-link" href="{{url_for('showrooms')}}">Reset Criteria</a> 
+                </div>
+                <!-- Navbar Right Side -->
+                <div class="navbar-nav">
+                    <a class="nav-item nav-link" href="{{url_for('facultyprofile')}}">{{name}}</a>
+                    <a class="nav-item nav-link" href="{{url_for('logout')}}">Logout</a> 
+                </div>
+              
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    {% if rooms %}
+    <div class="content-section">
+        <LEGEND>Room's Status</LEGEND>
+        <table class="table responsive" style="margin-top: 20px">
+    {%for i in range(l)%}
+     <tr>
+         {%for j in range(10)%}
+
+         {% if rooms[i*10+j] in vacant %}
+            <td>
+                <a href="{{url_for('deallocate', roomnum = rooms[i*10+j])}}" onclick="return confirmation()">{{rooms[i*10+j]}}</a>
+            </td>
+         {% else %}
+            <td style="background-color: lightgrey">
+                <a href="{{url_for('deallocate', roomnum = rooms[i*10+j])}}" onclick="return confirmation()">{{rooms[i*10+j]}}</a>
+            </td>
+         {% endif %}
+
+         {%endfor%}
+     </tr>
+     {%endfor%}
+     {% for i in range(r) %}
+
+         {% if rooms[l*10+i] in vacant %}
+            <td>
+                <a href="{{url_for('deallocate', roomnum = rooms[l*10+i])}}" onclick="return confirmation()">{{rooms[l*10+i]}}</a>
+            </td>
+         {% else %}
+            <td style="background-color: lightgrey">
+                <a href="{{url_for('deallocate', roomnum = rooms[l*10+i])}}" onclick="return confirmation()">{{rooms[l*10+i]}}</a>
+            </td>
+         {% endif %}
+     {% endfor %}
+    </table>
+    <div class="row" style="margin-top: 50px;margin-left: 20px">  
+    <a class="btn btn-outline-info mb-3" href="{{url_for('deallocateall')}}" onclick="return confirmationall();">Deallocate</a>
+    </div>
+</div>
+
+    {%endif%}
+    <script type="text/javascript">
+    function confirmation()
+    {
+        var a=confirm("Are you sure you want to deallocate this room?")
+        return a;
+    }
+    </script>
+
+    <script type="text/javascript">
+    function confirmationall()
+    {
+        var a=confirm("Are you sure you want to deallocate all students?")
+        return a;
+    }
+    </script>
+{% endblock %}
+{% block rightcontent %}
+    <div class="content-section">
+        <LEGEND>Representation</LEGEND>
+     <table style="margin-top: 20px;margin-bottom: 50px" class="table responsive">
+         
+         <tr>
+             <td>Vacant</td>
+             <td style="background-color: lightgrey">Filled</td>
+         </tr>
+     </table>
+    </div>
+{% endblock %}

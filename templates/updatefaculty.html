@@ -1,0 +1,129 @@
+{% extends 'layout.html' %}
+
+{% block nav %}
+	<nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+    	<div class="container">
+      		<a class="navbar-brand mr-4" href="{{url_for('facultyhome')}}">PEC</a>
+      		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+			    <span class="navbar-toggler-icon"></span>
+  			</button>
+  			<div class="collapse navbar-collapse" id="navbarToggle">
+    			<div class="navbar-nav mr-auto">
+      				<a class="nav-item nav-link" href="{{url_for('facultyhome')}}">Home</a>
+		        </div>
+    			<!-- Navbar Right Side -->
+    			<div class="navbar-nav">
+     				<a class="nav-item nav-link" href="{{url_for('fchangepass')}}">Change Password</a>
+       				<a class="nav-item nav-link" href="{{url_for('logout')}}">Logout</a>
+    			</div>
+  			</div>
+    	</div>
+  	</nav>
+{% endblock %} 
+
+{% block content %}
+    
+    <div class="content-section">
+        <div class="media">
+            <img class="rounded-circle account-img" src="{{image_file}}">
+            <div class="media-body">
+                <h2 class="account-heading">{{session['faculty']}}</h2>
+                <p class="text-secondary">{{session['email']}}</p>
+            </div>
+        </div>
+        <legend>Account Info</legend>
+        <br>
+        <form method="POST", enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+                {{ form.name.label(class="form-control-label") }}
+                {% if form.name.errors %}
+                    {{ form.name(class="form-control form-control-lg is-invalid", readonly = True) }}
+                    <div class="invalid-feedback">
+                        {% for error in form.name.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.name(class="form-control form-control-lg", readonly = True) }}
+                {% endif %}
+            </div> 
+
+            <div class="form-group">
+                {{ form.staffid.label(class="form-control-label") }}
+                {% if form.staffid.errors %}
+                    {{ form.staffid(class="form-control form-control-lg is-invalid", readonly = True) }}
+                    <div class="invalid-feedback">
+                        {% for error in form.staffid.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.staffid(class="form-control form-control-lg", readonly = True) }}
+                {% endif %}
+            </div> 
+
+            <div class="form-group">
+                {{ form.email.label(class="form-control-label") }}
+                {% if form.email.errors %}
+                    {{ form.email(class="form-control form-control-lg is-invalid", readonly = True) }}
+                    <div class="invalid-feedback">
+                        {% for error in form.email.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.email(class="form-control form-control-lg", readonly = True) }}
+                {% endif %}
+            </div> 
+            
+            <div class="form-group">
+                {{ form.phone.label(class="form-control-label") }}
+                {% if form.phone.errors %}
+                    {{ form.phone(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.phone.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.phone(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                {{ form.hostel.label(class="form-control-label") }}
+                {% if form.hostel.errors %}
+                    {{ form.hostel(class="form-control form-control-lg is-invalid", readonly = True) }}
+                    <div class="invalid-feedback">
+                        {% for error in form.hostel.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.hostel(class="form-control form-control-lg", readonly = True) }}
+                {% endif %}
+            </div> 
+
+
+            {{form.designation.label}}
+            {{form.designation(class="custom-select", style="margin-bottom:25px", disabled = True)}}
+
+            <div class="form-group">
+                {{ form.picture.label() }}
+                {{ form.picture(class='form-control-file')}}
+                {% if form.picture.errors %}
+                    {% for error in form.picture.errors %}
+                        <span class="text-danger">{{error}}</span> <br>
+                    {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="form-group" style="margin-top: 10px">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>         
+        </form>
+    </div>
+
+{% endblock %} 
