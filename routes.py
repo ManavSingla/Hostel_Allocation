@@ -2,33 +2,25 @@ import secrets
 import os
 from PIL import Image
 from flask import Flask, render_template, request, flash, url_for, redirect, sessions, session, send_file
-from flask_mysqldb import MySQL
 from flask_bcrypt import Bcrypt
-from forms import RegistrationForm, LoginForm, ForgotForm, ResetForm, NewPForm, CheckProfile, ChangePass, UpdateForm, StaffForm, AnnouncementForm, ComplaintForm, RoomForm, UComplaintForm, ProfileForm, UpdateStaffForm, UAnnouncementForm, UploadForm
+from mforms import RegistrationForm, LoginForm, ForgotForm, ResetForm, NewPForm, CheckProfile, ChangePass, UpdateForm, StaffForm, AnnouncementForm, ComplaintForm, RoomForm, UComplaintForm, ProfileForm, UpdateStaffForm, UAnnouncementForm, UploadForm
 import sms
 import random
 from datetime import datetime
 from werkzeug.utils import secure_filename
+import pyodbc
 
 
 
 app = Flask(__name__)
 
-app.config['SECRET_KEY'] = 'AjJ0lXaX5K9tai8QsUhwwQ'
-app.config['MYSQL_HOST'] = 'localhost'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'root'
-app.config['MYSQL_DB'] = 'flaskapp'
-
-mysql = MySQL(app)
+server = 'manav.database.windows.net'
+database = 'Hostel_Management'
+username = 'root7'
+password = 'Manav@123'
+driver= 'ODBC Driver 17 for SQL Server'
+cnxn = pyodbc.connect('DRIVER='+driver+';SERVER='+server+';PORT=1433;DATABASE='+database+';UID='+username+';PWD='+ password)
 bcrypt = Bcrypt(app)
-
-
-
-
-
-
-
 
 ################################################################################################## INDEX ###############
 
@@ -49,7 +41,7 @@ def register():
     form = RegistrationForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             user_details = request.form
             name = user_details['name']
             sid = user_details['sid']
@@ -64,7 +56,7 @@ def register():
             values = (name, sid, email, phone, hashed_pass, guardianname,guardianphone,address,batch)
             sql_formula = "INSERT INTO studentinfo (name, sid, email, phone, password, guardianname, guardianphone, address, batch) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)"
             cur.execute(sql_formula, values)
-            mysql.connection.commit()
+            cnxn.commit()
             flash("Thanks for Registering", 'success')
             cur.close()
             return redirect(url_for('slogin'))
@@ -88,7 +80,7 @@ def slogin():
         form = LoginForm()
         if request.method == 'POST':
             if form.validate_on_submit():
-                cur = mysql.connection.cursor()
+                cur = cnxn.cursor()
                 user_details = request.form
                 email = user_details['email']
                 password = user_details['password']
@@ -124,7 +116,7 @@ def slogin():
 def shome():
     if session.get('user'):
         profile = session['user']
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT  hostel from studentinfo where email = '{session['email']}'")
         fetch=cur.fetchone()
         hostel=fetch[0]
@@ -154,7 +146,7 @@ def shome():
 def watchannouncement():
     if session.get('user'):
         profile = session['user']
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT hostel from studentinfo where email='{session['email']}'")
         fetch= cur.fetchone()
         cur.execute(f"SELECT * from announcements where hostel='{fetch[0]}' order by postdate desc")
@@ -181,7 +173,7 @@ def postcomplaint():
     if session.get('user'):
         profile = session['user']
         form = ComplaintForm()
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT hostel from studentinfo where email='{session['email']}'")
         fetch= cur.fetchone()
         if fetch[0] == None:
@@ -208,7 +200,7 @@ def postcomplaint():
                 cur.execute(f"SELECT picture from studentinfo where sid = '{session['sid']}'")
                 picture=cur.fetchone()
                 cur.execute(f"UPDATE studentqueries set picture = '{picture[0]}' where sid = '{session['sid']}'")
-                mysql.connection.commit()
+                cnxn.commit()
                 flash("Complaint Posted Successfully!", 'success')
                 return redirect(url_for('postcomplaint'))
             else:
@@ -234,7 +226,7 @@ def postcomplaint():
 def complaint(queryno):
     if session.get('user'):
         profile = session['user']
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT name from studentqueries where qno = {queryno}")
         fetch = cur.fetchone()
         if fetch:
@@ -258,7 +250,7 @@ def updatecomplaint(queryno):
     if session.get('user'):
         form = UComplaintForm()
         profile = session['user']
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT name from studentqueries where qno = {queryno}")
         fetch = cur.fetchone()
         if fetch:
@@ -270,7 +262,7 @@ def updatecomplaint(queryno):
                     print(form.hostel.data)
                     if form.validate_on_submit():
                         cur.execute(f"UPDATE studentqueries set reciever='{form.to.data}', title= '{form.title.data}', content= '{form.content.data}' where qno = {queryno}")
-                        mysql.connection.commit()
+                        cnxn.commit()
                         flash("Update Successfull!", 'success')
                         return redirect(url_for('postcomplaint'))
                     else:
@@ -298,13 +290,13 @@ def updatecomplaint(queryno):
 @app.route('/deletecomplaint<int:queryno>')
 def deletecomplaint(queryno):
     if session.get('user'):
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT name from studentqueries where qno = {queryno}")
         fetch = cur.fetchone()
         if fetch:
             if session['user'] == fetch[0]:
                 cur.execute(f"DELETE from studentqueries where qno = {queryno}")
-                mysql.connection.commit()
+                cnxn.commit()
                 flash("Complaint Successfully Deleted!", 'success')
                 return redirect('postcomplaint')
             else:
@@ -328,14 +320,14 @@ def deletecomplaint(queryno):
 def selectroom():
     if session.get('user'):
         form = RoomForm()
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT hostel from studentinfo where email = '{session['email']}'")
         hostel = cur.fetchone()
         if hostel[0] == None:
             profile = session['user']
             rooms=[]
             vacant=[]
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             cur.execute(f"SELECT batch from studentinfo where email='{session['email']}'")
             batch = cur.fetchone()
             cur.execute(f"SELECT * from rooms where year = {batch[0]} and status <> 1")
@@ -413,7 +405,7 @@ def selected(roomnum=None,hostelname=None):
                         cur.execute(f"UPDATE rooms set status=1 where hostel='{hostelname}' and roomnum={roomnum}")
                     cur.execute(f"UPDATE rooms set totalin={totalin} where hostel='{hostelname}' and roomnum={roomnum}")
                     flash(" Room Successfully Registered!",'success')
-                    mysql.connection.commit()
+                    cnxn.commit()
 
 
                     cur.execute(f"SELECT floor, capacity from rooms where hostel='{hostelname}' and roomnum={roomnum}")
@@ -477,7 +469,7 @@ def updateprofile():
     if session.get('user'):
         form = UpdateForm()
         email = session['email']
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT picture from studentinfo where email = '{session['email']}'")
         pic = cur.fetchone()
         image_file = url_for('static', filename=f"img/profile_pics/{pic[0]}" )
@@ -494,7 +486,7 @@ def updateprofile():
                     cur.execute(f"UPDATE studentqueries set picture = '{picture_file}' where sid = '{session['sid']}'")
                 print(form.name.data)
                 cur.execute(f"UPDATE studentinfo set phone = '{form.phone.data}', batch = {form.batch.data}, guardianname = '{form.guardianname.data}', guardianphone = {form.guardianphone.data}, address = '{form.address.data}' where email = '{email}'")
-                mysql.connection.commit()
+                cnxn.commit()
                 cur.close()
                 flash("Update Successfull!", 'success')
                 return redirect(url_for('updateprofile'))
@@ -528,7 +520,7 @@ def updateprofile():
 def allotmentstatus():
     if session.get('user'):
         profile = session['user']
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         rooms=[]
         vacant=[]
         cur.execute(f"SELECT hostel, roomnum from studentinfo where email='{session['email']}'")
@@ -565,7 +557,7 @@ def forgot():
     form = ForgotForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             details = request.form
             email = details['email']
             cur.execute(f"SELECT phone FROM studentinfo where email = '{email}'")
@@ -614,9 +606,9 @@ def newpass():
             c_newpass = form.data['confirmnewpassword']
             if newpass == c_newpass:
                 hashed_pass = bcrypt.generate_password_hash(newpass).decode('utf-8')
-                cur = mysql.connection.cursor()
+                cur = cnxn.cursor()
                 cur.execute(f"UPDATE studentinfo set password = '{hashed_pass}' where email = '{session['email']}'")
-                mysql.connection.commit()
+                cnxn.commit()
                 flash("Password Changed Successfully", 'success')
                 return redirect(url_for('slogin'))
             else:
@@ -631,13 +623,13 @@ def changepass():
     if request.method=='POST':
         if form.validate_on_submit():
             oldp=form.oldpassword.data
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             cur.execute(f"SELECT password from studentinfo where email = '{session['email']}' ")
             fetch = cur.fetchone()
             if (bcrypt.check_password_hash(fetch[0], oldp)):
                 newpassworda = bcrypt.generate_password_hash(form.newpassword.data).decode('utf-8')
                 cur.execute(f" UPDATE  studentinfo  set password = '{newpassworda}' where email= '{session['email']}' ")
-                mysql.connection.commit()
+                cnxn.commit()
                 flash('Update successfull', 'success')
                 return redirect(url_for('shome'))
             else:
@@ -677,7 +669,7 @@ def sregister():
     form = StaffForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             user_details = request.form
             name = user_details['name']
             staffid = user_details['staffid']
@@ -694,7 +686,7 @@ def sregister():
                 values = (name, staffid, email, phone, hashed_pass, designation)
                 sql_formula = "INSERT INTO staffinfo (name, staffid, email, phone, password, designation) VALUES (%s, %s, %s, %s, %s, %s)"
             cur.execute(sql_formula, values)
-            mysql.connection.commit()
+            cnxn.commit()
             flash("Thanks for Registering", 'success')
             cur.close()
             return redirect(url_for('sregister'))
@@ -718,7 +710,7 @@ def flogin():
     else:
         if request.method == 'POST':
             if form.validate_on_submit():
-                cur = mysql.connection.cursor()
+                cur = cnxn.cursor()
                 user_details = request.form
                 email = user_details['email']
                 password = user_details['password']
@@ -757,7 +749,7 @@ def facultyhome():
     if session.get('faculty'):
         profile = session['faculty']
         form = CheckProfile()
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         if request.method == 'POST':
             if form.validate_on_submit():
                 cur.execute(f"SELECT sid from studentinfo where sid = '{form.data['sid']}'")
@@ -803,7 +795,7 @@ def facultyprofile():
     if session.get('faculty'):
         profile = session['faculty']
         form = UpdateStaffForm()
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT picture from staffinfo where email = '{session['email']}'")
         pic = cur.fetchone()
         image_file = url_for('static', filename=f"img/profile_pics/{pic[0]}" )
@@ -817,7 +809,7 @@ def facultyprofile():
                     cur.execute(f"UPDATE staffinfo set picture = '{picture_file}' where email = '{session['email']}'")
                     cur.execute(f"UPDATE announcements set picture = '{picture_file}' where authorid = '{session['staffid']}'")
                 cur.execute(f"UPDATE staffinfo set phone = {form.phone.data} where email = '{session['email']}'")
-                mysql.connection.commit()
+                cnxn.commit()
                 flash('Successfully Updated', 'success')
                 return redirect(url_for('facultyprofile'))
 
@@ -848,7 +840,7 @@ def announcement():
     if session.get('faculty'):
         profile = session['faculty']
         form = AnnouncementForm()
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT hostel from staffinfo where email='{session['email']}'")
         fetch= cur.fetchone()
         if fetch[0] != None:
@@ -876,7 +868,7 @@ def announcement():
                 cur.execute(f"SELECT picture from staffinfo where email = '{session['email']}'")
                 picture=cur.fetchone()
                 cur.execute(f"UPDATE announcements set picture = '{picture[0]}' where authorid='{session['staffid']}'")
-                mysql.connection.commit()
+                cnxn.commit()
                 flash("Announcement Posted Successfully!", 'success')
                 return redirect(url_for('announcement'))
             else:
@@ -902,7 +894,7 @@ def announcement():
 def openannouncement(ano):
     if session.get('faculty'):
         profile = session['faculty']
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT staffid from staffinfo where email = '{session['email']}'")
         staffid = cur.fetchone()
         cur.execute(f"SELECT authorid from announcements where ano = {ano}")
@@ -929,7 +921,7 @@ def updateannouncement(ano):
     if session.get('faculty'):
         form = UAnnouncementForm()
         profile = session['faculty']
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT staffid from staffinfo where email = '{session['email']}'")
         staffid = cur.fetchone()
         cur.execute(f"SELECT authorid from announcements where ano = {ano}")
@@ -943,7 +935,7 @@ def updateannouncement(ano):
                 if request.method == 'POST':
                     if form.validate_on_submit():
                         cur.execute(f"UPDATE announcements set type='{form.type.data}', title= '{form.title.data}', content= '{form.content.data}' where ano = {ano}")
-                        mysql.connection.commit()
+                        cnxn.commit()
                         flash("Update Successfull!", 'success')
                         return redirect(url_for('announcement'))
                     else:
@@ -973,7 +965,7 @@ def updateannouncement(ano):
 @app.route('/deleteannouncement<int:ano>')
 def deleteannouncement(ano):
     if session.get('faculty'):
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT staffid from staffinfo where email = '{session['email']}'")
         staffid = cur.fetchone()
         cur.execute(f"SELECT authorid from announcements where ano = {ano}")
@@ -981,7 +973,7 @@ def deleteannouncement(ano):
         if fetch:
             if staffid[0] == fetch[0]:
                 cur.execute(f"DELETE from announcements where ano = {ano}")
-                mysql.connection.commit()
+                cnxn.commit()
                 flash("Announcement Successfully Deleted!", 'success')
                 return redirect(url_for('announcement'))
             else:
@@ -1004,7 +996,7 @@ def deleteannouncement(ano):
 def profile(studentid):
     if session.get('faculty'):
         profile = session['faculty']
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         form = ProfileForm()
         cur.execute(f"SELECT name from studentinfo where sid = '{studentid}'")
         name = cur.fetchone()
@@ -1060,7 +1052,7 @@ def profile(studentid):
                         elif fetch[2]==studentid:
                             cur.execute(f"UPDATE rooms set seater3=null, totalin=2,status=0 where roomnum={roomnum[0]}")
                 cur.execute(f"DELETE FROM studentinfo where sid = '{studentid}'")
-                mysql.connection.commit()
+                cnxn.commit()
                 flash(f"{name[0]} is blacklisted!", 'success')
                 cur.close()
                 return redirect(url_for('facultyhome'))
@@ -1086,7 +1078,7 @@ def allotmentcriteria():
         if session['designation'] != 'Admin':
             profile = session['faculty']
             form = RoomForm()
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             rooms = []
             first=[]
             second=[]
@@ -1104,7 +1096,7 @@ def allotmentcriteria():
 
             if request.method == 'POST':
                 if form.batch.data != '':
-                    cur = mysql.connection.cursor()
+                    cur = cnxn.cursor()
                     floor = form.floor.data
                     capacity = form.capacity.data
                     if form.floor.data == '' and form.capacity.data == '':
@@ -1152,7 +1144,7 @@ def allotted(roomnum, batch):
             second=[]
             third=[]
             fourth=[]
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             cur.execute(f"SELECT * from rooms where roomnum={roomnum}")
             fetch = cur.fetchone()
             if len(fetch) == 0:
@@ -1166,7 +1158,7 @@ def allotted(roomnum, batch):
                 if int(batch)>=1 and int(batch)<=4:
                     if request.method == 'POST':
                         if form.batch.data != '':
-                            cur = mysql.connection.cursor()
+                            cur = cnxn.cursor()
                             cur.execute(f"SELECT batch from studentinfo where email='{session['email']}'")
                             batch = cur.fetchone()
                             floor = form.floor.data
@@ -1198,7 +1190,7 @@ def allotted(roomnum, batch):
                     cur.execute(f"SELECT floor, capacity from rooms where hostel = '{hostel[0]}' and roomnum = {roomnum}")
                     fetch = cur.fetchone()
                     cur.execute(f"UPDATE rooms set year = {batch} where hostel = '{hostel[0]}' and roomnum = {roomnum}")
-                    mysql.connection.commit()
+                    cnxn.commit()
                     form.hostel.data = hostel[0]
                     form.batch.data = str(batch)
                     cur.execute(f"SELECT * from rooms where hostel = '{hostel[0]}' order by roomnum ")
@@ -1245,10 +1237,10 @@ def showrooms():
         if session['designation'] != 'Admin':
             profile = session['faculty']
             form = RoomForm()
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             if request.method == 'POST':
                 cur.execute(f"UPDATE rooms set year = null")
-                mysql.connection.commit()
+                cnxn.commit()
                 flash("Allotment Criteria Resetting, Successfully Done!",'success')
             rooms=[]
             first=[]
@@ -1287,7 +1279,7 @@ def deallocaterooms():
         if session['designation'] != 'Admin':
             flash('Click on room number to dealloate!', 'info')
             profile = session['faculty']
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             rooms=[]
             vacant=[]
             cur.execute(f"SELECT hostel from staffinfo where email='{session['email']}'")
@@ -1318,13 +1310,13 @@ def deallocaterooms():
 def deallocateall():
     if session.get('faculty'):
         if session['designation'] != 'Admin':
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             cur.execute(f"SELECT hostel from staffinfo where email = '{session['email']}'")
             hostel = cur.fetchone()
             cur.execute(f"UPDATE studentinfo set hostel = null, roomnum = null where hostel = '{hostel[0]}'")
             cur.execute(f"UPDATE rooms set seater1 = null, seater2 = null, seater3 = null, totalin = 0, status = 0 where hostel='{hostel[0]}'")
             cur.execute(f"DELETE from studentqueries where hostel='{hostel[0]}'")
-            mysql.connection.commit()
+            cnxn.commit()
             flash("Successfully Dealloacated!", 'success')
             return redirect(url_for('showrooms'))
         else:
@@ -1347,7 +1339,7 @@ def deallocateall():
 def deallocate(roomnum):
     if session.get('faculty'):
         if session['designation'] != 'Admin':
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             cur.execute(f"SELECT * from rooms where roomnum={roomnum}")
             fetch = cur.fetchone()
             if fetch[0] != None:
@@ -1363,7 +1355,7 @@ def deallocate(roomnum):
                 for s in sid:
                     if s[0] != None:
                         cur.execute(f"DELETE from studentqueries where sid = '{s[0]}'")
-                mysql.connection.commit()
+                cnxn.commit()
                 flash(f"Successfully Dealloacated Room Number {roomnum}!", 'success')
                 return redirect(url_for('deallocate'))
             else:
@@ -1386,7 +1378,7 @@ def deallocate(roomnum):
 def showqueries():
     if session.get('faculty'):
         profile = session['faculty']
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT designation from staffinfo where email='{session['email']}'")
         fetch = cur.fetchone()
         cur.execute(f"SELECT * from studentqueries where reciever='{fetch[0]}' order by postdate desc")
@@ -1416,13 +1408,13 @@ def fchangepass():
         if request.method=='POST':
             if form.validate_on_submit():
                 oldp=form.oldpassword.data
-                cur = mysql.connection.cursor()
+                cur = cnxn.cursor()
                 cur.execute(f"SELECT password from staffinfo where email = '{session['email']}' ")
                 fetch = cur.fetchone()
                 if (bcrypt.check_password_hash(fetch[0], oldp)):
                     newpassworda = bcrypt.generate_password_hash(form.newpassword.data).decode('utf-8')
                     cur.execute(f" UPDATE  staffinfo  set password = '{newpassworda}' where email= '{session['email']}' ")
-                    mysql.connection.commit()
+                    cnxn.commit()
                     flash('Password Changed Successfullyly!', 'success')
                     return redirect(url_for('facultyhome'))
                 else:
@@ -1443,7 +1435,7 @@ def facultyforgot():
     form = ForgotForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             details = request.form
             email = details['email']
             cur.execute(f"SELECT phone FROM staffinfo where email = '{email}'")
@@ -1488,9 +1480,9 @@ def fnewpass():
             c_newpass = form.data['confirmnewpassword']
             if newpass == c_newpass:
                 hashed_pass = bcrypt.generate_password_hash(newpass).decode('utf-8')
-                cur = mysql.connection.cursor()
+                cur = cnxn.cursor()
                 cur.execute(f"UPDATE staffinfo set password = '{hashed_pass}' where email = '{session['email']}'")
-                mysql.connection.commit()
+                cnxn.commit()
                 flash("Password Changed Successfully", 'success')
                 return redirect(url_for('flogin'))
             else:
@@ -1510,7 +1502,7 @@ def uploadfile():
     if session.get('faculty'):
         if session['designation'] != 'Admin':
             form = UploadForm()
-            cur = mysql.connection.cursor()
+            cur = cnxn.cursor()
             cur.execute(f"SELECT hostel from staffinfo where email='{session['email']}'")
             fetch = cur.fetchone()
             hostel = fetch[0]
@@ -1539,7 +1531,7 @@ def uploadfile():
 @app.route('/downloadfile')
 def download():
     if session.get('user'):
-        cur = mysql.connection.cursor()
+        cur = cnxn.cursor()
         cur.execute(f"SELECT hostel from studentinfo where sid = '{session['sid']}'")
         hostel = cur.fetchone()
         if hostel[0] != None:
