@@ -3,3 +3,4 @@ flask_Bcrypt
 pyodbc
 email_validator
 flask_wtf
+PIL
