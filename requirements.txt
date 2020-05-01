@@ -4,3 +4,4 @@ pyodbc
 email_validator
 flask_wtf
 pillow
+requests
