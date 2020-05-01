@@ -3,7 +3,7 @@ import os
 from PIL import Image
 from flask import Flask, render_template, request, flash, url_for, redirect, sessions, session, send_file
 from flask_bcrypt import Bcrypt
-from mforms import RegistrationForm, LoginForm, ForgotForm, ResetForm, NewPForm, CheckProfile, ChangePass, UpdateForm, StaffForm, AnnouncementForm, ComplaintForm, RoomForm, UComplaintForm, ProfileForm, UpdateStaffForm, UAnnouncementForm, UploadForm
+from forms import RegistrationForm, LoginForm, ForgotForm, ResetForm, NewPForm, CheckProfile, ChangePass, UpdateForm, StaffForm, AnnouncementForm, ComplaintForm, RoomForm, UComplaintForm, ProfileForm, UpdateStaffForm, UAnnouncementForm, UploadForm
 import sms
 import random
 from datetime import datetime
@@ -13,7 +13,7 @@ import pyodbc
 
 
 app = Flask(__name__)
-
+app.secret_key='Nottobetold'
 server = 'manav.database.windows.net'
 database = 'Hostel_Management'
 username = 'root7'
